@@ -175,25 +175,27 @@ func (p *SSHProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	}
 
 	sshTunnel.Auth = []ssh.SSHAuth{}
-	privateKey := ssh.SSHPrivateKey{}
-	if data.Auth.PrivateKey.Content.ValueString() != "" {
-		privateKey.PrivateKey = data.Auth.PrivateKey.Content.ValueString()
-	}
-	if data.Auth.PrivateKey.Password.ValueString() != "" {
-		privateKey.Password = data.Auth.PrivateKey.Password.ValueString()
-	}
-	if data.Auth.PrivateKey.Certificate.ValueString() != "" {
-		privateKey.Certificate = data.Auth.PrivateKey.Certificate.ValueString()
-	}
-	sshTunnel.Auth = append(sshTunnel.Auth, privateKey)
-	if authSock != "" {
-		sshTunnel.Auth = append(sshTunnel.Auth, ssh.SSHAuthSock{
-			Path: authSock,
-		})
-	}
+  if data.Auth.PrivateKey != nil {
+    privateKey := ssh.SSHPrivateKey{}
+    if data.Auth.PrivateKey.Content.ValueString() != "" {
+      privateKey.PrivateKey = data.Auth.PrivateKey.Content.ValueString()
+    }
+    if data.Auth.PrivateKey.Password.ValueString() != "" {
+      privateKey.Password = data.Auth.PrivateKey.Password.ValueString()
+    }
+    if data.Auth.PrivateKey.Certificate.ValueString() != "" {
+      privateKey.Certificate = data.Auth.PrivateKey.Certificate.ValueString()
+    }
+    sshTunnel.Auth = append(sshTunnel.Auth, privateKey)
+  }
 	if data.Auth.Password.ValueString() != "" {
 		sshTunnel.Auth = append(sshTunnel.Auth, ssh.SSHPassword{
 			Password: data.Auth.Password.ValueString(),
+		})
+	}
+	if authSock != "" {
+		sshTunnel.Auth = append(sshTunnel.Auth, ssh.SSHAuthSock{
+			Path: authSock,
 		})
 	}
 	resp.DataSourceData = &sshTunnel
